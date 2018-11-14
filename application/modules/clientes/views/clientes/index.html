@@ -1,0 +1,602 @@
+{% extends "main.html" %}
+
+{% block script %}
+    <!--dataTables-->
+    <link rel="stylesheet" type="text/css" href="{{ base_url() }}plugins/DataTables/DataTables-1.10.16/css/dataTables.bootstrap.min.css"/>
+    <!--Botones dataTables-->
+    <link rel="stylesheet" type="text/css" href="{{base_url()}}plugins/DataTables/Buttons-1.5.1/css/buttons.bootstrap.min.css"/>
+    <!--Responsive-->
+    <link rel="stylesheet" type="text/css" href="{{base_url()}}plugins/DataTables/Responsive-2.2.1/css/responsive.dataTables.min.css"/>
+    <!--Selected-->
+    <link rel="stylesheet" type="text/css" href="{{base_url()}}plugins/DataTables/Select-1.2.5/css/select.bootstrap.min.css"/>
+    <!--dataTables-->
+    <script type="text/javascript" src="{{ base_url() }}plugins/DataTables/datatables.min.js"></script>
+    <script type="text/javascript" src="{{ base_url() }}plugins/DataTables/DataTables-1.10.16/js/dataTables.bootstrap.min.js"></script>
+    <!--botones dataTables-->
+    <script type="text/javascript" src="{{ base_url() }}plugins/DataTables/Buttons-1.5.1/js/buttons.bootstrap.min.js"></script>
+    <!--exportar a excel-->
+    <script type="text/javascript" src="{{ base_url() }}plugins/DataTables/JSZip-2.5.0/jszip.min.js"></script>
+    <!--exportar a pdf-->
+    <script type="text/javascript" src="{{ base_url() }}plugins/DataTables/pdfmake-0.1.32/pdfmake.min.js"></script>
+    <script type="text/javascript" src="{{ base_url() }}plugins/DataTables/pdfmake-0.1.32/vfs_fonts.js"></script>
+    <!--colvis-->
+    <script type="text/javascript" src="{{ base_url() }}plugins/DataTables/Buttons-1.5.1/js/buttons.colVis.min.js"></script>
+    <!--Reorder-->
+    <script type="text/javascript" src="{{ base_url() }}plugins/DataTables/ColReorder-1.4.1/js/dataTables.colReorder.min.js"></script>
+    <!--Responsive-->
+    <script type="text/javascript" src="{{ base_url() }}plugins/DataTables/Responsive-2.2.1/js/dataTables.responsive.min.js"></script>
+    <!--selected-->
+    <script type="text/javascript" src="{{ base_url() }}plugins/DataTables/Select-1.2.5/js/dataTables.select.min.js"></script>
+    <!--Validar-->
+    <script type="text/javascript" src="{{ base_url() }}plugins/forms/validation/jquery.validate.js"></script>
+    <script type="text/javascript" src="{{ base_url() }}plugins/forms/validation/localization/messages_es.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#edit_telefono").mask("(99) 9999-9999");
+            $('#tableIngenia').DataTable( {
+                "dom": '<"dt-buttons"Bf><"clear">lirtp',
+                "language": {
+                    "url":"{{ base_url() }}plugins/tables/datatables/swf/Spanish.json",
+                    "buttons":{
+                        "copySuccess": {
+                            "1": "Copiada una columna al portapapeles",
+                            "_": "Copiados %d columnas al portapapeles"
+                        },
+                        "copyTitle": "Copiar al portapapeles",
+                        "copyKeys": "Presiona <i>ctrl</i> o <i>\u2318</i> + <i>C</i> para copiar los datos de la tabla<br>al portapapeles.<br><br>para cancelar, click a este mensaje o presiona escape."
+                    }
+                },
+                "paging" : true,
+                "autoWidth": true,
+                "searching": true,
+                "scrollX": true,
+                "responsive": true,
+                "buttons": [
+                    {
+                        extend:    'copyHtml5',
+                        text:      '<img src="{{ base_url() }}img/Iconos/copiar.jpg" width="32" height="32">',
+                        titleAttr: 'Copiar al portapapeles',
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5,6],
+                        },
+                    },
+                    {
+                        extend:    'excelHtml5',
+                        text:      '<img src="{{ base_url() }}img/Iconos/xls2.png" width="32" height="32">',
+                        titleAttr: 'Exportar a Excel',
+                        tittle: 'Clientes',
+                        filename: 'Clientes',
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5,6],
+                        },
+                        customize: function( xlsx ) {
+                            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            //All cells
+                            $('row c', sheet).attr('s', '25');
+                            //First row  
+                            $('row c[r*="2"]', sheet).attr( 's', '42');
+                            var source = xlsx.xl['workbook.xml'].getElementsByTagName('sheet')[0];
+                            source.setAttribute('name','Clientes');
+                        }
+                    },
+                    {
+                        extend:    'csvHtml5',
+                        text:      '<img src="{{ base_url() }}img/Iconos/csv.png" width="32" height="32">',
+                        titleAttr: 'Exportar a CSV',
+                        tittle: 'Clientes',
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5,6],
+                        },
+                    },
+                    {
+                        extend:    'pdfHtml5',
+                        text:      '<img src="{{ base_url() }}img/Iconos/pdf.png">',
+                        titleAttr: 'Exportar a PDF',
+                        tittle: 'Clientes',
+                        pageSize: 'A4',
+                        filename: 'Clientes',
+                        orientation: 'portrait',
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5,6],
+                        },
+                        customize: function ( doc ) {
+                            //Remove the title created by datatTables
+                            doc.content.splice(0,1);
+                            //Create a date string that we use in the footer. Format is dd-mm-yyyy
+                            var now = new Date();
+                            var jsDate = now.getDate()+'-'+(now.getMonth()+1)+'-'+now.getFullYear();
+                            var logo = 'data:image/jpg;base64,".{{logo64}}."';
+                            // A documentation reference can be found at
+                            // https://github.com/bpampuch/pdfmake#getting-started
+                            // Set page margins [left,top,right,bottom] or [horizontal,vertical]
+                            // or one number for equal spread
+                            // It's important to create enough space at the top for a header !!!
+                            doc.pageMargins = [20,80,20,30];
+
+                            // Set the font size fot the entire document
+                            doc.defaultStyle.fontSize = 12;
+                            // Set the fontsize for the table header
+                            doc.styles.tableHeader.fontSize = 14;
+                            // Create a header object with 3 columns
+                            // Left side: Logo
+                            // Middle: brandname
+                            // Right side: A document title
+                            doc['header']=(function() {
+                                return {
+                                    columns: [
+                                        {
+                                            image: logo,
+                                            width: 100
+                                        },
+                                        {
+                                            alignment: 'center',
+                                            italics: true,
+                                            text: '',
+                                            fontSize: 16,
+                                            margin: [30,0]
+                                        },
+                                        {
+                                            alignment: 'right',
+                                            fontSize: 14,
+                                            text: '{{titulo}}'
+                                        }
+                                    ],
+                                    margin: 20
+                                }
+                            });
+                            // Create a footer object with 2 columns
+                            // Left side: report creation date
+                            // Right side: current page and total pages
+                            doc['footer']=(function(page, pages) {
+                                return {
+                                    columns: [
+                                        {
+                                            alignment: 'left',
+                                            text: ['Creado el: ', { text: jsDate.toString() }]
+                                        },
+                                        {
+                                            alignment: 'right',
+                                            text: ['pagina ', { text: page.toString() },  ' de ', { text: pages.toString() }]
+                                        }
+                                    ],
+                                    margin: 20
+                                }
+                            });
+                            // Change dataTable layout (Table styling)
+                            // To use predefined layouts uncomment the line below and comment the custom lines below
+                            // doc.content[0].layout = 'lightHorizontalLines'; // noBorders , headerLineOnly
+                            var objLayout = {};
+                            objLayout['hLineWidth'] = function(i) { return .5; };
+                            objLayout['vLineWidth'] = function(i) { return .5; };
+                            objLayout['hLineColor'] = function(i) { return '#aaa'; };
+                            objLayout['vLineColor'] = function(i) { return '#aaa'; };
+                            objLayout['paddingLeft'] = function(i) { return 4; };
+                            objLayout['paddingRight'] = function(i) { return 4; };
+                            doc.content[0].layout = objLayout;
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text:    '<img src="{{ base_url() }}img/Iconos/printer1.png" width="32" height="32" style="position: relative; float: right; cursor:pointer;">',
+                        titleAttr: 'Imprimir',
+                        tittle: 'Clientes',
+                        pageSize: 'A4',
+                        filename: 'Clientes',
+                        orientation: 'portrait',
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5,6],
+                        },
+                        customize: function ( doc ) {
+                            //Remove the title created by datatTables
+                            doc.content.splice(0,1);
+                        },
+                        customize: function ( win ) {
+                            $(win.document.body).find('h1').css('text-align','center');
+                            $(win.document.body).find( 'table' )
+                              .addClass( 'compact' )
+                              .css( 'font-size', '8pt' );
+                        }
+                    },
+                    {
+                        extend:'colvis',
+                        text:'<img src="{{ base_url() }}img/Iconos/procesar_icono.png" width="32" height="32" style="position: relative; float: right; cursor:pointer;">',
+                        titleAttr: 'Seleccionar Columnas',
+                        tittle: 'Clientes',
+                        
+                    },
+                    {
+                        text: 'Nuevo',
+                        text:'<img src="{{ base_url() }}img/Iconos/Add.png" width="32" height="32" style="position: relative; float: right; cursor:pointer;">',
+                        titleAttr: 'Nuevo Registro',
+                        tittle: 'Clientes',
+                        action: function ( e, dt, node, config ) {
+                            agregarCliente();
+                            $("#editClienteModal").modal()
+                        }
+                    },
+                ],
+            });
+        });
+
+        function load(){
+            var cct = $.cookie("{{ csrf_cname }}");
+            $.ajax({
+                url: '{{ base_url() ~ modulo }}/cliente/listar',
+                type: 'post',
+                data: { '{{ ctokename }}':cct},
+                beforeSend: function(objeto){
+                    $('#resultados').html('<img src="{{ base_url() }}img/Iconos/cargando.gif"> Cargando...');
+                },
+                success: function(datos) {
+                    $("#resultados").html(datos);
+                }
+          });
+        }
+        /**
+        // summary: Diccionario lista de abreviaciones de tarjeta de credito
+        // descripcion:
+        // un hash de validar CC abbreviaciones y expresiones regulares
+        // mastercard: Mastercard
+        // visa: Visa
+        // americanexpress: American Express
+        // example:
+        // if(!creditCardValidator.validate(document.id("creditCardField"))){alert("Invalid credit card!");}
+         */
+        
+        var creditCardValidator = {};
+        // Pin the cards to them
+        creditCardValidator.cards = {
+            'mastercard':/^5[1-5]\d{2}-?\d{4}-?\d{4}-?\d{4}$/,
+            'visa':/^4\d{3}-?\d{4}-?\d{4}-?\d{4}$/,
+            'americanexpress':/^3[47][0-9]{13}$/
+        };
+        // Add the card validator to them
+        creditCardValidator.validate = function(value,ccType) {
+            value = String(value).replace(/[- ]/g,''); //ignore dashes and whitespaces
+            console.log("value:"+value);
+            var cardinfo = creditCardValidator.cards, results = [];
+            console.log(cardinfo);
+            if(ccType){
+                    var expr = cardinfo[ccType.toLowerCase()];
+                    console.log(expr);
+                    console.log(value.match(expr));
+                    return expr ? !!value.match(expr) : false; // boolean
+            }
+
+            for(var p in cardinfo){
+                    if(value.match(cardinfo[p])){
+                            results.push(p);
+                    }
+            }
+            return results.length ? results.join('|') : false; // String | boolean
+        };
+        function agregarCliente(){
+            $('.modal').on('show.bs.modal', function(){
+                $('#edit_registro_cliente')[0].reset();//para borrar todos los datos que tenga el formulario. 
+                $('#edit_tarjeta').val('').trigger('change');
+                //lo utilice para borrar la etiqueta de error del jquery validate
+                $('div').closest('.form-group').removeClass('has-error').removeClass('has-success');
+                $("span.help-block").remove();
+                
+            });
+            $("#editClienteModal").modal();
+        }
+    </script>
+{% endblock %}
+
+{% block contenido %}
+<!--Panel-->
+<div class="row">
+    <div class="col-sm-12">
+        <!-- Start col-lg- 3 -->
+        <div class="panel panel-default panelMove">
+            <!-- Start .panel -->
+            <div class="panel-heading">
+                <h4 class="panel-title"><i class="l-basic-home"></i></h4>
+            </div>
+            <div class="panel-body">
+                <!--inicia contenido-->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <!--tablas-->
+                        <div class="row">
+                            <div id='resultados' class="col-lg-12">
+                                <!-- col-lg-12 start here -->
+                                <table id="tableIngenia" class="table table-bordered table-hover dt-responsive" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Id Cliente</th>
+                                            <th>Nombre(s)</th>
+                                            <th>Apellidos</th>
+                                            <th>Telefono</th>
+                                            <th>Email</th>
+                                            <th>Tarjeta</th>
+                                            <th>Numero Tarjeta</th>
+                                            <th>Status</th>
+                                            <th>Accion</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% set estilo = '' %}
+                                        {% for c in clientes %}
+                                        {% if c.status == 0 %}{% set estilo = 'lightRed' %}{%else%}{% set estilo = '' %}{% endif %}
+                                        <tr class='{{estilo}}'>
+                                            <td>{{ c.id_cliente }}</td>
+                                            <td>{{ c.nombres }}</td>
+                                            <td>{{ c.apellidos }}</td>
+                                            <td>{{ c.telefono }}</td>
+                                            <td>{{ c.email }}</td>
+                                            <td>{{ c.tarjeta }}</td>
+                                            <td>{{ c.num_tarjeta }}</td>
+                                            <td>{% if c.status == 1 %} Activo {% else %} Desactivo {% endif %}</td>
+                                            <td>
+                                                <div class="btn-group pull-right">
+                                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Acciones <span class="fa fa-caret-down"></span></button>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="#" data-target="#editClienteModal" class="edit" data-toggle="modal" data-id-cliente='{{c.id_cliente}}' data-nombres='{{c.nombres}}' data-apellidos="{{c.apellidos}}" data-telefono='{{c.telefono}}' data-email='{{c.email}}' data-tarjeta='{{c.tarjeta}}' data-numTarjeta='{{c.num_tarjeta}}' data-status="{{c.status}}"><i class="fa fa-edit" data-toggle="tooltip" title="Editar"></i> Editar</a></li>
+                                                            <li> <a href="#deleteModal" class="delete" data-toggle="modal" data-id="{{c.id_cliente}}"><i class="fa fa-trash" data-toggle="tooltip" title="Eliminar"></i> Borrar</a></li>
+                                                        </ul>
+                                                </div><!-- /btn-group -->
+                                            </td>
+                                        </tr>
+                                         {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!--fin tablas-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Fin Panel-->
+<!-- Editar Registro Cliente-->
+<div class="modal fade" id="editClienteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form name="edit_registro_cliente" id="edit_registro_cliente" class="form-horizontal group-border stripped">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span>
+                    </button>
+                    <h4 class="modal-title" id="muestraPruebasLabel">Datos Registro</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="col-sm-12">
+                        <input type='hidden' id='edit_id_cliente' name='edit_id_cliente' value=''/>
+                            <input type="hidden" id="contactosasoc" name="contactosasoc" value="0" />
+                            <input type="hidden" id="id_sucursal" name="id_sucursal" value="{{ usuario['id_sucursal'] }}" />
+                        <div class="form-group">
+                          <label class="col-lg-2 col-md-3  control-label" for="">Nombre(s)</label>
+                          <div class="col-lg-10 col-md-9">
+                            <div class="input-group input-icon">
+                              <span class="input-group-addon"><i class="glyphicon glyphicon-user s16"></i></span>
+                              <input type="text" name="edit_nombres" id="edit_nombres" class="form-control" placeholder="Nombre"  required>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-lg-2 col-md-3 control-label" for="">Apellidos</label>
+                          <div class="col-lg-10 col-md-9">
+                            <div class="input-group input-icon">
+                                <span class="input-group-addon"><i class="fa fa-key s16"></i></span>
+                                <input id="edit_apellidos" name="edit_apellidos"  type="text" class="form-control" placeholder="Apellidos" required>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-lg-2 col-md-3 control-label" for="">Telefono</label>
+                          <div class="col-lg-10 col-md-9">
+                            <div class="input-group input-icon">
+                                <span class="input-group-addon"><i class="fa fa-phone s16"></i></span>
+                                <input class="form-control" name="edit_telefono" id="edit_telefono" type="text" placeholder="(99) 9999-9999" required>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-lg-2 col-md-3 control-label" for="">Email</label>
+                          <div class="col-lg-10 col-md-9">
+                              <div class="input-group input-icon"">
+                                  <span class="input-group-addon"><i class="fa fa-envelope s16"></i></span>
+                                  <input type="email" name="edit_email" id="edit_email" class="form-control" placeholder="email" required>
+                              </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-lg-2 col-md-3 control-label" for="edit_tarjeta">Tipo Tarjeta</label>
+                          <div class="col-lg-10 col-md-9">
+                            <select class="form-control select2" name="edit_tarjeta" id="edit_tarjeta" style="width: 100%" required>
+                                <option value="">-- Selecciona Tipo Tarjeta --</option>
+                                <option value="AmericanExpress">American Express</option>
+                                <option value="Mastercard">Mastercard</option>
+                                <option value="Visa">Visa</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-lg-2 col-md-3 control-label" for="">Numero Tarjeta</label>
+                          <div class="col-lg-10 col-md-9">
+                            <div class="input-group input-icon">
+                                <span class="input-group-addon"><i class="fa fa-cc-visa s16"></i></span>
+                                <input class="form-control" name="edit_num_tarjeta" id="edit_num_tarjeta" type="text" placeholder="Numero Tarjeta" required>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-lg-2 col-md-3 control-label" for="edit_tarjeta">Status</label>
+                          <div class="col-lg-10 col-md-9">
+                            <select class="form-control select2" name="edit_status" id="edit_status" style="width: 100%" required>
+                                <option value="">--Selecciona Status--</option>
+                                <option value="1">Activo</option>
+                                <option value="0">Desactivo</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-10">
+                                <table id="tablacontactos" class="table table-bordered table-condensed table-striped"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Eliminar -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form name="delete_registro" id="delete_registro">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span>
+                    </button>
+                    <h4 class="modal-title" id="deleteModalLabel">Eliminar Registro</h4>
+                </div>
+                <div class="modal-body">
+                    <p>¿Seguro que quieres eliminar este registro?</p>
+                    <p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
+                    <input type="hidden" name="delete_id" id="delete_id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--Fin Panel-->
+{% endblock %}
+{% block script2 %}
+    <script type="text/javascript">
+        $('#editClienteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget) // Button that triggered the modal
+            var cct = $.cookie("{{ csrf_cname }}");
+            var id_cliente = button.data('id-cliente') 
+            $('#edit_id_cliente').val(id_cliente)
+            var nombres = button.data('nombres') 
+            $('#edit_nombres').val(nombres)
+            var apellidos = button.data('apellidos') 
+            $('#edit_apellidos').val(apellidos)
+            var telefono = button.data('telefono') 
+            $('#edit_telefono').val(telefono)
+            var email = button.data('email') 
+            $('#edit_email').val(email)
+            var tarjeta = button.data('tarjeta') 
+            $('#edit_tarjeta').val(tarjeta)
+            var numTarjeta = button.data('numTarjeta') 
+            $('#edit_num_tarjeta').val(numTarjeta)
+            var status = button.data('status') 
+            $('#edit_status').val(status)
+            var parametros = { '{{ ctokename }}':cct, id_cliente:$('#edit_id_cliente').val() };
+        });
+
+        $("#edit_registro_cliente").validate({
+            ignore: null,
+            ignore: 'input[type="hidden"]',
+            errorPlacement: function( error, element ) {
+                if (element.parent('.input-group').length) {
+                  error.insertAfter(element.parent());
+                } else if (element.hasClass('.select2')) {
+                  error.insertAfter(element.next('span'));
+                } else {
+                  error.insertAfter(element);
+                }
+            },
+            errorElement: "span",
+            errorClass: 'help-block',
+            rules: {
+                edit_nombres: "required",
+                edit_apellidos: "required",
+                edit_telefono:"required",
+                edit_email:{
+                  email: true,
+                  required: true
+                },
+                tarjeta: "required",
+                edit_num_tarjeta: {
+                  required: true,
+                  minlength: 13,
+                  maxlength: 19
+                },
+                edit_status: "required"
+            },
+            messages: {
+                tarjeta: "Por favor seleccione una opción",
+                edit_status: "Por favor seleccione una opción"
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass(errorClass); //.removeClass(errorClass);
+                $(element).closest('.form-group').removeClass('has-success').addClass('has-error');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass(errorClass); //.addClass(validClass);
+                $(element).closest('.form-group').removeClass('has-error').addClass('has-success');
+            },
+            success: function( label ) {
+                $(label).closest('.form-group').removeClass('has-error');
+                label.remove();
+            },
+            submitHandler: function(form) {
+                event.preventDefault();
+                var numTarjeta = $('#edit_num_tarjeta').val();
+                numTarjeta = numTarjeta.substr(-4, 4);
+                var cct = $.cookie("{{ csrf_cname }}");
+                var parametros = { '{{ ctokename }}':cct, id_cliente:$('#edit_id_cliente').val(), nombres:$('#edit_nombres').val(), apellidos:$('#edit_apellidos').val(), telefono:$('#edit_telefono').val(), email:$('#edit_email').val(), tarjeta:$('#edit_tarjeta').val(), numTarjeta:numTarjeta, status:$('#edit_status').val()};
+                console.log(creditCardValidator.validate($('#edit_num_tarjeta').val(),$('#edit_tarjeta').val()));
+                if(creditCardValidator.validate($('#edit_num_tarjeta').val(),$('#edit_tarjeta').val())){
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ base_url() ~ modulo }}/cliente/guardar",
+                        data: parametros,
+                        beforeSend: function(objeto){
+                          $("#resultados").html("Mensaje: Enviando...");
+                        },
+                        success: function(datos){
+                            muestraMsg(datos);
+                            load();
+                            $('#editClienteModal').modal('hide');
+                        }
+                    });    
+                }else{
+                    swal("debe de Ingresar un numero de tarjeta valido!", "Entendido?")
+                    return false;
+                }
+            }      
+        });
+
+        $('#deleteModal').on('show.bs.modal', function (event) {
+              var button = $(event.relatedTarget) // Button that triggered the modal
+              var id = button.data('id') 
+              $('#delete_id').val(id)
+        });
+
+        $( "#delete_registro" ).submit(function( event ) {
+            var cct = $.cookie("{{ csrf_cname }}");
+            var parametros = { '{{ ctokename }}':cct, id_cliente:$('#delete_id').val() };  
+            $.ajax({
+                type: "POST",
+                url: "{{ base_url() ~ modulo }}/cliente/eliminar",
+                data: parametros,
+                beforeSend: function(objeto){
+                    $("#resultados").html("Mensaje: Enviando...");
+                },
+                success: function(datos){
+                    load();
+                    $('#deleteModal').modal('hide');
+                    muestraMsg(datos);
+                }
+            });
+            event.preventDefault();
+        });
+</script>
+{% endblock %}

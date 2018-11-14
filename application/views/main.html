@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es" class="no-js">
+    <head>
+        <meta name="theme-color" content="#2196F3">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta charset="utf-8" Accept-Encoding: gzip, deflate/>
+        <meta http-equiv="Cache-control" content="private" max-age="3600">
+        <title>{{ titulo }}</title>
+        <!-- Mobile specific metas -->
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <!-- Force IE9 to render in normal mode -->
+        <!--[if IE]><meta http-equiv="x-ua-compatible" content="IE=9" /><![endif]-->
+        <meta name="author" content="Antonio de Jesus Cruz Arias" />
+        <meta name="description" content="Examen Ingenia - Login de Acceso al sistema" />
+        <meta name="keywords" content="Examen Ingenia" />
+        <meta name="application-name" content="Examen Ingenia" />
+        <!-- Import google fonts - Heading first/ text second -->
+        <link href='{{ base_url() }}css/fonts.css' rel='stylesheet' type='text/css'>
+        <!-- Css files -->
+        <!-- Icons -->
+        <link rel="preload" href="{{ base_url() }}css/icons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" media="screen"/>
+        <!-- Bootstrap stylesheets (included template modifications) -->
+        <link rel="preload" href="{{ base_url() }}css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" media="screen"/>
+        <!-- Plugins stylesheets (all plugin custom css) -->
+        <link rel="preload" href="{{ base_url() }}css/plugins.css" as="style" onload="this.onload=null;this.rel='stylesheet'" media="screen"/>
+        <!-- Plugins stylesheets (slect2 css) -->
+        <link rel="preload" href="{{ base_url() }}plugins/forms/select2/dist/css/select2.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" media="screen"/>
+        <!-- Main stylesheets (template main css file) -->
+        <link rel="preload" href="{{ base_url() }}css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'" media="screen" />
+        <!-- Custom stylesheets ( Put your own changes here ) -->
+        <link rel="preload" href="{{ base_url() }}css/custom.css" as="style" onload="this.onload=null;this.rel='stylesheet'" media="screen" />
+        <!-- Fav and touch icons -->
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ base_url() }}img/favicon/apple-icon-144x144.png">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ base_url() }}img/favicon/apple-icon-114x114.png">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ base_url() }}img/favicon/apple-icon-72x72.png">
+        <link rel="apple-touch-icon-precomposed" href="{{ base_url() }}img/favicon/apple-icon-57x57.png">
+        <link rel="icon" href="{{ base_url() }}img/favicon/favicon.ico" type="image/png">
+        <!-- Windows8 touch icon ( http://www.buildmypinnedsite.com/ )-->
+        <meta name="msapplication-TileColor" content="#3399cc" />
+        <!-- Load pace first -->
+        <script src="{{ base_url() }}plugins/core/pace/pace.min.js"></script>
+        <!-- Important javascript libs(put in all pages) -->
+        <script ype="text/javascript" src="{{ base_url() }}js/pages/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="{{ base_url() }}js/libs/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="{{ base_url() }}js/jquery_cookie.min.js"></script>
+        <!--[if lt IE 9]>
+          <script type="text/javascript" src="{{ base_url() }}js/libs/excanvas.min.js"></script>
+          <script type="text/javascript" src="{{ base_url() }}js/libs/respond.min.js"></script>
+        <![endif]-->
+        {% block css %} {% endblock %}
+        <!-- otros javascript -->
+        {% block script %} {% endblock %}
+        <!-- Javascripts -->
+        <script type="text/javascript">
+            $(document).ready(function() {
+                {% if mensaje != '' %}
+                    muestraMsg('{{ mensaje }}');
+                {% endif %}
+                {% if mensaje2 != '' %}
+                    muestraMsg2('{{ mensaje2.msg }}','{{mensaje2.msgIco}}','{{mensaje2.msgClass_name}}');
+                {% endif %}
+            });
+        </script>
+    </head>
+    <body>
+        <div id="zombra" class="zombra"></div>
+        <!--[if lt IE 9]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+        <!-- .page-navbar -->
+        <div id="header" class="page-navbar">
+            <!-- .navbar-brand -->
+            <a href="{{ base_url() }}main/index" class="navbar-brand hidden-xs hidden-sm">
+                <img src="{{ base_url() }}img/logo_ingenia.png" class="logo hidden-xs" alt="logo_ingenia" >
+                <img src="{{ base_url() }}img/favicon/ms-icon-310x310.png" class="logo-sm hidden-lg hidden-md" alt="logo_ingenia" width="90%">
+            </a>
+            <!-- / navbar-brand -->
+            <!-- .no-collapse -->
+            <div id="navbar-no-collapse" class="navbar-no-collapse">
+                <!-- top left nav -->
+                <ul class="nav navbar-nav">
+                    <li class="toggle-sidebar">
+                        <a href="#">
+                            <i class="fa fa-reorder"></i>
+                            <span class="sr-only">Collapse sidebar</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+                
+                <!-- top right nav -->
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="{{ base_url() }}login/salir">
+                            <i class="fa fa-power-off"></i>
+                            <span class="sr-only">Cerrar Session</span>
+                        </a>
+                    </li>
+                </ul>
+                <!-- / top right nav -->
+            </div>
+            <!-- / collapse -->
+        </div>
+        <!-- / page-navbar -->
+        <!-- #wrapper -->
+        <div id="wrapper">
+            <!-- .page-sidebar -->
+            <aside id="sidebar" class="page-sidebar hidden-md hidden-sm hidden-xs">
+                <!-- Start .sidebar-inner -->
+                <div class="sidebar-inner">
+                    <!-- Start .sidebar-scrollarea -->
+                    <div class="sidebar-scrollarea">
+                        <!--  .sidebar-panel -->
+                        <div class="sidebar-panel">
+                            <h5 class="sidebar-panel-title">Perfil Usuario</h5>
+                        </div>
+                        <div class="user-info clearfix">
+                            <img src="{{ base_url() }}img/avatars/{{ usuario['avatar'] }}"  alt="avatar">
+                            <span class="name">{{ usuario['nombre']|title  }} {{ usuario['apellidos']|title }}</span>
+                            <div class="btn-group">
+                                
+                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">Ajustes <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu right" role="menu">
+                                    <li class="divider"></li>
+                                    <li><a href="{{ base_url() }}login/salir"><i class="fa fa-power-off"></i>Salir</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!--  .sidebar-panel -->
+                        <div class="sidebar-panel">
+                            <h5 class="sidebar-panel-title">Menu</h5>
+                        </div>
+                        <!-- / .sidebar-panel -->
+                        <!-- .side-nav -->
+                        <div class="side-nav">
+                            <ul class="nav">
+                                <li>
+                                    <a href="{{ base_url() }}clientes/cliente" class="{% if controlador=='cliente' %} active {% endif %}"><span class="txt">Clientes</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- / side-nav -->
+                    </div>
+                    <!-- End .sidebar-scrollarea -->
+                </div>
+                <!-- End .sidebar-inner -->
+            </aside>
+            <!-- .page-content -->
+            <div class="page-content sidebar-page right-sidebar-page clearfix">
+                <!-- .page-content-wrapper -->
+                <div class="page-content-wrapper">
+                    <div class="page-content-inner">
+                        <!-- Start .page-content-inner -->
+                        <div id="page-header" class="clearfix">
+                            <div class="page-header">
+                                <h2>{{icono|raw}}{{pagina}}</h2>
+                            </div>
+                        </div>
+                        <!-- Start .row -->
+                        <div class="row">
+                            {% block contenido %} {% endblock %}
+                        </div>
+                        <!-- End .row -->
+                    </div>
+                    <!-- End .page-content-inner -->
+                </div>
+                <!-- / page-content-wrapper -->
+            </div>
+            <!-- / page-content -->
+        </div>
+        <!-- / #wrapper -->
+        <div id="footer" class="clearfix sidebar-page right-sidebar-page">
+            <!-- Start #footer  -->
+            <div class="pull-right hidden-xs">
+        <b>Versión</b> 1.0
+    </div>
+    <strong>Copyright &copy; 2018 <a  href="https://antoniocruz.000webhostapp.com/" target="_blank">Antonio de Jesus Cruz Arias Sistemas Web</a></strong> Todos los derechos reservados.
+        </div>
+        <!-- End #footer  -->
+        <!--///////javascripts por defecto -->
+         <!-- Javascripts -->
+        <!-- Bootstrap plugins -->
+        <script src="{{ base_url() }}js/bootstrap/bootstrap.min.js"></script>
+        <!-- Core plugins ( not remove ) -->
+        <script src="{{ base_url() }}js/libs/modernizr.custom.min.js"></script>
+        <!-- Handle responsive view functions -->
+        <script src="{{ base_url() }}js/jRespond.min.js"></script>
+        <!-- Custom scroll for sidebars,tables and etc. -->
+        <script src="{{ base_url() }}plugins/core/slimscroll/jquery.slimscroll.min.js"></script>
+        <script src="{{ base_url() }}plugins/core/slimscroll/jquery.slimscroll.horizontal.min.js"></script>
+        <!-- Remove click delay in touch -->
+        <script src="{{ base_url() }}plugins/core/fastclick/fastclick.min.js"></script>
+        <!-- Increase jquery animation speed -->
+        <script src="{{ base_url() }}plugins/core/velocity/jquery.velocity.min.js"></script>
+        <!-- Quick search plugin (fast search for many widgets) -->
+        <script src="{{ base_url() }}plugins/core/quicksearch/jquery.quicksearch.min.js"></script>
+        <!-- Bootbox fast bootstrap modals -->
+        <script src="{{ base_url() }}plugins/ui/bootbox/bootbox.min.js"></script>
+        <!-- Other plugins ( load only nessesary plugins for every page) -->
+        <!--file-->
+        <script src="{{ base_url() }}plugins/forms/bootstrap-filestyle/bootstrap-filestyle.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/fancyselect/fancySelect.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/select2/dist/js/select2.full.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/maskedinput/jquery.maskedinput.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/dual-list-box/jquery.bootstrap-duallistbox.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/spinner/jquery.bootstrap-touchspin.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/bootstrap-datepicker/locales/bootstrap-datepicker.es.js" charset="UTF-8"></script>
+        <script src="{{ base_url() }}plugins/forms/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/bootstrap-colorpicker/bootstrap-colorpicker.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/summernote/summernote.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/bootstrap-markdown/bootstrap-markdown.min.js"></script>
+        <script src="{{ base_url() }}plugins/forms/dropzone/dropzone.min.js"></script>
+        <script src="{{ base_url() }}plugins/charts/sparklines/jquery.sparkline.min.js"></script>
+        <script src="{{ base_url() }}plugins/ui/title-notifier/title_notifier.min.js"></script>
+        <script src="{{ base_url() }}plugins/ui/bootstrap-sweetalert/sweet-alert.js"></script>
+        <script src="{{ base_url() }}plugins/ui/notify/jquery.gritter.min.js"></script>
+        <script src="{{ base_url() }}js/libs/typeahead.bundle.min.js"></script>
+        <script src="{{ base_url() }}js/jquery.dynamic.min.js"></script>
+        <script src="{{ base_url() }}js/main.min.js"></script>
+        <script src="{{ base_url() }}js/comun.js"></script>
+        {% block script2 %}{% endblock %}
+        <!-- Back to top -->
+        <div id="back-to-top"><a href="#">Regresar al inicio</a>
+        </div>
+    </body>
+</html>

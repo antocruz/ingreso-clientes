@@ -1,0 +1,234 @@
+{% block script %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#tableIngenia').DataTable( {
+                dom: '<"dt-buttons"Bf><"clear">lirtp',
+                language: {
+                    url:"{{ base_url() }}plugins/tables/datatables/swf/Spanish.json",
+                    buttons:{
+                        "copySuccess": {
+                            "1": "Copiada una columna al portapapeles",
+                            "_": "Copiados %d columnas al portapapeles"
+                        },
+                        "copyTitle": "Copiar al portapapeles",
+                        "copyKeys": "Presiona <i>ctrl</i> o <i>\u2318</i> + <i>C</i> para copiar los datos de la tabla<br>al portapapeles.<br><br>para cancelar, click a este mensaje o presiona escape."
+                    }
+                },
+                paging : true,
+                autoWidth: true,
+                searching: true,
+                scrollX: true,
+                responsive: true,
+                buttons: [
+                    {
+                        extend:    'copyHtml5',
+                        text:      '<img src="{{ base_url() }}img/Iconos/copiar.jpg" width="32" height="32">',
+                        titleAttr: 'Copiar al portapapeles',
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18],
+                        },
+                    },
+                    {
+                        extend:    'excelHtml5',
+                        text:      '<img src="{{ base_url() }}img/Iconos/xls2.png" width="32" height="32">',
+                        titleAttr: 'Exportar a Excel',
+                        tittle: 'Clientes',
+                        filename: 'Clientes',
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18],
+                        },
+                        customize: function( xlsx ) {
+                            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            //All cells
+                            $('row c', sheet).attr('s', '25');
+                            //First row  
+                            $('row c[r*="2"]', sheet).attr( 's', '42');
+                            var source = xlsx.xl['workbook.xml'].getElementsByTagName('sheet')[0];
+                            source.setAttribute('name','Clientes');
+                        }
+                    },
+                    {
+                        extend:    'csvHtml5',
+                        text:      '<img src="{{ base_url() }}img/Iconos/csv.png" width="32" height="32">',
+                        titleAttr: 'Exportar a CSV',
+                        tittle: 'Clientes',
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18],
+                        },
+                    },
+                    {
+                        extend:    'pdfHtml5',
+                        text:      '<img src="{{ base_url() }}img/Iconos/pdf.png">',
+                        titleAttr: 'Exportar a PDF',
+                        tittle: 'Clientes',
+                        pageSize: 'A4',
+                        filename: 'Clientes',
+                        orientation: 'landscape', //portrait
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18],
+                        },
+                        customize: function ( doc ) {
+                            //Remove the title created by datatTables
+                            doc.content.splice(0,1);
+                            //Create a date string that we use in the footer. Format is dd-mm-yyyy
+                            var now = new Date();
+                            var jsDate = now.getDate()+'-'+(now.getMonth()+1)+'-'+now.getFullYear();
+                            var logo = 'data:image/jpg;base64,".{{logo64}}."';
+                            // A documentation reference can be found at
+                            // https://github.com/bpampuch/pdfmake#getting-started
+                            // Set page margins [left,top,right,bottom] or [horizontal,vertical]
+                            // or one number for equal spread
+                            // It's important to create enough space at the top for a header !!!
+                            doc.pageMargins = [20,80,20,30];
+
+                            // Set the font size fot the entire document
+                            doc.defaultStyle.fontSize = 7;
+                            // Set the fontsize for the table header
+                            doc.styles.tableHeader.fontSize = 7;
+                            // Create a header object with 3 columns
+                            // Left side: Logo
+                            // Middle: brandname
+                            // Right side: A document title
+                            doc['header']=(function() {
+                                return {
+                                    columns: [
+                                        {
+                                            image: logo,
+                                            width: 100
+                                        },
+                                        {
+                                            alignment: 'center',
+                                            italics: true,
+                                            text: '',
+                                            fontSize: 16,
+                                            margin: [30,0]
+                                        },
+                                        {
+                                            alignment: 'right',
+                                            fontSize: 14,
+                                            text: '{{titulo}}'
+                                        }
+                                    ],
+                                    margin: 20
+                                }
+                            });
+                            // Create a footer object with 2 columns
+                            // Left side: report creation date
+                            // Right side: current page and total pages
+                            doc['footer']=(function(page, pages) {
+                                return {
+                                    columns: [
+                                        {
+                                            alignment: 'left',
+                                            text: ['Creado el: ', { text: jsDate.toString() }]
+                                        },
+                                        {
+                                            alignment: 'right',
+                                            text: ['pagina ', { text: page.toString() },  ' de ', { text: pages.toString() }]
+                                        }
+                                    ],
+                                    margin: 20
+                                }
+                            });
+                            // Change dataTable layout (Table styling)
+                            // To use predefined layouts uncomment the line below and comment the custom lines below
+                            // doc.content[0].layout = 'lightHorizontalLines'; // noBorders , headerLineOnly
+                            var objLayout = {};
+                            objLayout['hLineWidth'] = function(i) { return .5; };
+                            objLayout['vLineWidth'] = function(i) { return .5; };
+                            objLayout['hLineColor'] = function(i) { return '#aaa'; };
+                            objLayout['vLineColor'] = function(i) { return '#aaa'; };
+                            objLayout['paddingLeft'] = function(i) { return 4; };
+                            objLayout['paddingRight'] = function(i) { return 4; };
+                            doc.content[0].layout = objLayout;
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text:    '<img src="{{ base_url() }}img/Iconos/printer1.png" width="32" height="32" style="position: relative; float: right; cursor:pointer;">',
+                        titleAttr: 'Imprimir',
+                        tittle: 'Clientes',
+                        pageSize: 'A4',
+                        filename: 'Clientes',
+                        orientation: 'landscape', //portrait
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18],
+                        },
+                        customize: function ( doc ) {
+                            //Remove the title created by datatTables
+                            doc.content.splice(0,1);
+                        },
+                        customize: function ( win ) {
+                            $(win.document.body).find('h1').css('text-align','center');
+                            $(win.document.body)
+                                .css( 'font-size', '8pt' )
+                                .prepend(
+                                 '<img src="{{ base_url() }}img/logo_agua.png" class="marca-de-agua" style="position:absolute;text-align: center;opacity: 0.45;" />'
+                                );
+                            $(win.document.body).find( 'table' )
+                              .addClass( 'compact' )
+                              .css( 'font-size', '8pt' );
+                        }
+                    },
+                    {
+                        extend:'colvis',
+                        text:'<img src="{{ base_url() }}img/Iconos/procesar_icono.png" width="32" height="32" style="position: relative; float: right; cursor:pointer;">',
+                        titleAttr: 'Seleccionar Columnas',
+                        tittle: 'Clientes',
+                        
+                    },
+                    {
+                        text: 'Nuevo',
+                        text:'<img src="{{ base_url() }}img/Iconos/Add.png" width="32" height="32" style="position: relative; float: right; cursor:pointer;">',
+                        titleAttr: 'Nuevo Registro',
+                        tittle: 'Clientes',
+                        action: function ( e, dt, node, config ) {
+                            agregarCliente();
+                            $("#editClienteModal").modal()
+                        }
+                    },
+                ],
+            });
+        });
+    </script>
+{% endblock %}
+<table id="tableIngenia" class="table table-bordered table-hover dt-responsive" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Id Cliente</th>
+            <th>Nombre(s)</th>
+            <th>Apellidos</th>
+            <th>Telefono</th>
+            <th>Email</th>
+            <th>Tarjeta</th>
+            <th>Numero Tarjeta</th>
+            <th>Status</th>
+            <th>Accion</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set estilo = '' %}
+        {% for c in clientes %}
+        {% if c.status == 0 %}{% set estilo = 'lightRed' %}{%else%}{% set estilo = '' %}{% endif %}
+        <tr class='{{estilo}}'>
+            <td>{{ c.id_cliente }}</td>
+            <td>{{ c.nombres }}</td>
+            <td>{{ c.apellidos }}</td>
+            <td>{{ c.telefono }}</td>
+            <td>{{ c.email }}</td>
+            <td>{{ c.tarjeta }}</td>
+            <td>{{ c.num_tarjeta }}</td>
+            <td>{% if c.status == 1 %} Activo {% else %} Desactivo {% endif %}</td>
+            <td>
+                <div class="btn-group pull-right">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Acciones <span class="fa fa-caret-down"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" data-target="#editClienteModal" class="edit" data-toggle="modal" data-id-cliente='{{c.id_cliente}}' data-nombres='{{c.nombres}}' data-apellidos="{{c.apellidos}}" data-telefono='{{c.telefono}}' data-email='{{c.email}}' data-tarjeta='{{c.tarjeta}}' data-numTarjeta='{{c.num_tarjeta}}' data-status="{{c.status}}"><i class="fa fa-edit" data-toggle="tooltip" title="Editar"></i> Editar</a></li>
+                            <li> <a href="#deleteModal" class="delete" data-toggle="modal" data-id="{{c.id_cliente}}"><i class="fa fa-trash" data-toggle="tooltip" title="Eliminar"></i> Borrar</a></li>
+                        </ul>
+                </div><!-- /btn-group -->
+            </td>
+        </tr>
+         {% endfor %}
+    </tbody>
+</table>
